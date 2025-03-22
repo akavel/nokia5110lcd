@@ -9,17 +9,24 @@ use defmt::*;
 use embassy_executor::Spawner;
 use embassy_rp::bind_interrupts;
 use embassy_rp::gpio::{Output, Level};
-use embassy_rp::peripherals::{DMA_CH0, PIO0, PIN_25};
-use embassy_rp::pio::{InterruptHandler, Pio};
+use embassy_rp::peripherals::{DMA_CH0, PIO0, PIN_25, USB};
+use embassy_rp::pio::{InterruptHandler as PioInt, Pio};
 use embassy_rp::pio_programs::ws2812::{PioWs2812, PioWs2812Program};
+use embassy_rp::usb::{Driver, InterruptHandler as UsbInt};
 use embassy_time::{Duration, Ticker, Timer};
 use smart_leds::RGB8;
 use pcd8544::PCD8544;
 use {defmt_rtt as _, panic_probe as _};
 
 bind_interrupts!(struct Irqs {
-    PIO0_IRQ_0 => InterruptHandler<PIO0>;
+    PIO0_IRQ_0 => PioInt<PIO0>;
+    USBCTRL_IRQ => UsbInt<USB>;
 });
+
+#[embassy_executor::task]
+async fn logger_task(driver: Driver<'static, USB>) {
+    embassy_usb_logger::run!(1024, log::LevelFilter::Info, driver);
+}
 
 /// Input a value 0 to 255 to get a color value
 /// The colours are a transition r - g - b - back to r.
@@ -40,6 +47,9 @@ fn wheel(mut wheel_pos: u8) -> RGB8 {
 async fn main(spawner: Spawner) {
     info!("Start");
     let p = embassy_rp::init(Default::default());
+
+    let usb_driver = Driver::new(p.USB, Irqs);
+    let _ = spawner.spawn(logger_task(usb_driver));
 
     let _ = spawner.spawn(rainbow(p.PIN_25, p.DMA_CH0, p.PIO0));
 
@@ -62,10 +72,12 @@ async fn main(spawner: Spawner) {
     lcd.reset().expect("cannot fail");
     writeln!(lcd, "Hello lcd!");
 
+    let mut counter = 0;
     loop {
-        lcd.set_light(true);
-        Timer::after_secs(1).await;
-        lcd.set_light(false);
+        counter += 1;
+        log::info!("Tick {}", counter);
+
+        lcd.set_light(counter % 2 == 0);
         Timer::after_secs(1).await;
     }
 }

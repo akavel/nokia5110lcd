@@ -8,6 +8,7 @@ embassy-embedded-hal = { version = "0.3.0", features = ["defmt"] }
 embassy-executor = { version = "0.7.0", features = ["task-arena-size-98304", "arch-cortex-m", "executor-thread", "executor-interrupt", "defmt"] }
 embassy-time = { version = "0.4.0", features = ["defmt", "defmt-timestamp-uptime"] }
 embassy-rp = { version = "0.4.0", features = ["defmt", "unstable-pac", "time-driver", "critical-section-impl", "rp2040"] }
+embassy-usb-logger = { version = "0.4.0" }
 
 defmt = "0.3"
 defmt-rtt = "0.4"
@@ -20,6 +21,7 @@ panic-probe = { version = "0.3", features = ["print-defmt"] }
 
 smart-leds = "0.4.0"
 pcd8544 = "0.2.0" # TODO: also consider the other one
+log = "0.4"
 
 embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
 embedded-hal-async = "1.0"
