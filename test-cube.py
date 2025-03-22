@@ -13,6 +13,7 @@ cs = Pin(5) # a.k.a. CE
 dc = Pin(4)
 rst = Pin(6)
 bl = Pin(7, Pin.OUT, value=1) # backlight on
+bl.off()
 
 lcd = pcd8544_fb.PCD8544_FB(spi, cs, dc, rst)
 
