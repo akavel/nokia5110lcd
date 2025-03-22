@@ -8,7 +8,7 @@ use defmt::*;
 use embassy_executor::Spawner;
 use embassy_rp::bind_interrupts;
 use embassy_rp::gpio::{Output, Level};
-use embassy_rp::peripherals::PIO0;
+use embassy_rp::peripherals::{DMA_CH0, PIO0, PIN_25};
 use embassy_rp::pio::{InterruptHandler, Pio};
 use embassy_rp::pio_programs::ws2812::{PioWs2812, PioWs2812Program};
 use embassy_time::{Duration, Ticker, Timer};
@@ -39,22 +39,24 @@ async fn main(spawner: Spawner) {
     info!("Start");
     let p = embassy_rp::init(Default::default());
 
-    let Pio { mut common, sm0, .. } = Pio::new(p.PIO0, Irqs);
+    let _ = spawner.spawn(rainbow(p.PIN_25, p.DMA_CH0, p.PIO0));
 
+}
+
+#[embassy_executor::task]
+async fn rainbow(pin: PIN_25, dma: DMA_CH0, pio: PIO0) {
     // This is the number of leds in the string. Helpfully, the sparkfun thing plus and adafruit
     // feather boards for the 2040 both have one built in.
     const NUM_LEDS: usize = 1;
     let mut data = [RGB8::default(); NUM_LEDS];
 
+    let Pio { mut common, sm0, .. } = Pio::new(pio, Irqs);
+
     // Common neopixel pins:
     // Thing plus: 8
     // Adafruit Feather: 16;  Adafruit Feather+RFM95: 4
     let program = PioWs2812Program::new(&mut common);
-    let mut ws2812 = PioWs2812::new(&mut common, sm0, p.DMA_CH0, p.PIN_25, &program);
-
-
-    // let mut led = Output::new(p.PIN_4, Level::High);
-    let _ = spawner.spawn(hilo(p.PIN_4));
+    let mut ws2812 = PioWs2812::new(&mut common, sm0, dma, pin, &program);
 
     // Loop forever making RGB values and pushing them out to the WS2812.
     let mut ticker = Ticker::every(Duration::from_millis(10));
@@ -69,18 +71,6 @@ async fn main(spawner: Spawner) {
 
             ticker.next().await;
         }
-    }
-}
-
-#[embassy_executor::task]
-async fn hilo(pin: embassy_rp::peripherals::PIN_4) {
-    let mut led = Output::new(pin, Level::High);
-    loop {
-        led.set_high();
-        Timer::after_secs(2).await;
-
-        led.set_low();
-        Timer::after_secs(2).await;
     }
 }
 
