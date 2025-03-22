@@ -7,10 +7,11 @@
 use defmt::*;
 use embassy_executor::Spawner;
 use embassy_rp::bind_interrupts;
+use embassy_rp::gpio::{Output, Level};
 use embassy_rp::peripherals::PIO0;
 use embassy_rp::pio::{InterruptHandler, Pio};
 use embassy_rp::pio_programs::ws2812::{PioWs2812, PioWs2812Program};
-use embassy_time::{Duration, Ticker};
+use embassy_time::{Duration, Ticker, Timer};
 use smart_leds::RGB8;
 use {defmt_rtt as _, panic_probe as _};
 
@@ -34,7 +35,7 @@ fn wheel(mut wheel_pos: u8) -> RGB8 {
 }
 
 #[embassy_executor::main]
-async fn main(_spawner: Spawner) {
+async fn main(spawner: Spawner) {
     info!("Start");
     let p = embassy_rp::init(Default::default());
 
@@ -51,6 +52,10 @@ async fn main(_spawner: Spawner) {
     let program = PioWs2812Program::new(&mut common);
     let mut ws2812 = PioWs2812::new(&mut common, sm0, p.DMA_CH0, p.PIN_25, &program);
 
+
+    // let mut led = Output::new(p.PIN_4, Level::High);
+    let _ = spawner.spawn(hilo(p.PIN_4));
+
     // Loop forever making RGB values and pushing them out to the WS2812.
     let mut ticker = Ticker::every(Duration::from_millis(10));
     loop {
@@ -64,6 +69,18 @@ async fn main(_spawner: Spawner) {
 
             ticker.next().await;
         }
+    }
+}
+
+#[embassy_executor::task]
+async fn hilo(pin: embassy_rp::peripherals::PIN_4) {
+    let mut led = Output::new(pin, Level::High);
+    loop {
+        led.set_high();
+        Timer::after_secs(2).await;
+
+        led.set_low();
+        Timer::after_secs(2).await;
     }
 }
 
