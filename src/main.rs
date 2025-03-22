@@ -4,6 +4,7 @@
 #![no_std]
 #![no_main]
 
+use core::fmt::Write;
 use defmt::*;
 use embassy_executor::Spawner;
 use embassy_rp::bind_interrupts;
@@ -13,6 +14,7 @@ use embassy_rp::pio::{InterruptHandler, Pio};
 use embassy_rp::pio_programs::ws2812::{PioWs2812, PioWs2812Program};
 use embassy_time::{Duration, Ticker, Timer};
 use smart_leds::RGB8;
+use pcd8544::PCD8544;
 use {defmt_rtt as _, panic_probe as _};
 
 bind_interrupts!(struct Irqs {
@@ -41,6 +43,31 @@ async fn main(spawner: Spawner) {
 
     let _ = spawner.spawn(rainbow(p.PIN_25, p.DMA_CH0, p.PIO0));
 
+    let mut lcd_clk   = Output::new(p.PIN_2, Level::Low);
+    let mut lcd_din   = Output::new(p.PIN_3, Level::Low);
+    let mut lcd_dc    = Output::new(p.PIN_4, Level::Low);
+    let mut lcd_ce    = Output::new(p.PIN_5, Level::Low);
+    let mut lcd_rst   = Output::new(p.PIN_6, Level::Low);
+    let mut lcd_light = Output::new(p.PIN_7, Level::High);
+
+    let mut lcd = PCD8544::new(
+        lcd_clk,
+        lcd_din,
+        lcd_dc,
+        lcd_ce,
+        lcd_rst,
+        lcd_light,
+    ).expect("cannot fail");
+
+    lcd.reset().expect("cannot fail");
+    writeln!(lcd, "Hello lcd!");
+
+    loop {
+        lcd.set_light(true);
+        Timer::after_secs(1).await;
+        lcd.set_light(false);
+        Timer::after_secs(1).await;
+    }
 }
 
 #[embassy_executor::task]

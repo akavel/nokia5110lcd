@@ -858,6 +858,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
+name = "pcd8544"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "571497fc414e3e2c7a829b9b1afddee9e7b329c2f02a80f285cf15f9a612bee0"
+dependencies = [
+ "embedded-hal 0.2.7",
+]
+
+[[package]]
 name = "petgraph"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1224,6 +1233,7 @@ dependencies = [
  "embedded-io-async",
  "embedded-storage",
  "panic-probe",
+ "pcd8544",
  "smart-leds",
 ]
 
