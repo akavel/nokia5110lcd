@@ -77,8 +77,17 @@ async fn main(spawner: Spawner) {
         counter += 1;
         log::info!("Tick {}", counter);
 
-        lcd.set_light(counter % 2 == 0);
+        // lcd.set_light(counter % 2 == 0);
         Timer::after_secs(1).await;
+
+        lcd.set_contrast(64);
+        let res = lcd.write_char('M');
+        lcd.set_light(true);
+
+        let x = lcd.x();
+        let y = lcd.y();
+        log::info!("x={x}, y={y}; res={res:?}");
+
     }
 }
 
