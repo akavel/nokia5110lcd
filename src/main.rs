@@ -15,9 +15,7 @@ use embassy_rp::pio_programs::ws2812::{PioWs2812, PioWs2812Program};
 use embassy_rp::usb::{Driver, InterruptHandler as UsbInt};
 use embassy_time::{Duration, Ticker, Timer};
 use smart_leds::RGB8;
-// use pcd8544::PCD8544;
 use {defmt_rtt as _, panic_probe as _};
-use lcd_hal::Display;
 
 bind_interrupts!(struct Irqs {
     PIO0_IRQ_0 => PioInt<PIO0>;
@@ -54,8 +52,8 @@ async fn main(spawner: Spawner) {
 
     let _ = spawner.spawn(rainbow(p.PIN_25, p.DMA_CH0, p.PIO0));
 
-    let mut lcd_clk   = Output::new(p.PIN_2, Level::Low);
-    let mut lcd_din   = Output::new(p.PIN_3, Level::Low);
+    // let mut lcd_clk   = Output::new(p.PIN_2, Level::Low);
+    // let mut lcd_din   = Output::new(p.PIN_3, Level::Low);
     let mut lcd_dc    = Output::new(p.PIN_4, Level::Low);
     let mut lcd_ce    = Output::new(p.PIN_5, Level::Low);
     let mut lcd_rst   = Output::new(p.PIN_6, Level::Low);
@@ -63,32 +61,6 @@ async fn main(spawner: Spawner) {
 
     lcd_light.set_high();
 
-    /*
-    let mut lcd = PCD8544::new(
-        lcd_clk,
-        lcd_din,
-        lcd_dc,
-        lcd_ce,
-        lcd_rst,
-        lcd_light,
-    ).expect("cannot fail");
-    */
-
-    let mut delay = embassy_time::Delay{};
-    let mut lcd = lcd_hal::pcd8544::gpio::Pcd8544Gpio::new(
-        lcd_clk,
-        lcd_din,
-        lcd_dc,
-        lcd_ce,
-        &mut lcd_rst,
-        &mut delay,
-    ).expect("cannot fail");
-
-    // lcd.reset().expect("cannot fail");
-    // writeln!(lcd, "Hello lcd!");
-
-    lcd.clear();
-    lcd.print(b"Hallo therea!");
 
     let mut counter = 0;
     loop {
@@ -97,15 +69,6 @@ async fn main(spawner: Spawner) {
 
         // lcd.set_light(counter % 2 == 0);
         Timer::after_secs(1).await;
-
-        // lcd.set_contrast(64);
-        // let res = lcd.print_char('M');
-        // lcd.set_light(true);
-        let _ = lcd.print_char(b'M');
-
-        // let x = lcd.x();
-        // let y = lcd.y();
-        // log::info!("x={x}, y={y}; res={res:?}");
 
     }
 }
@@ -134,6 +97,7 @@ async fn rainbow(pin: PIN_25, dma: DMA_CH0, pio: PIO0) {
                 data[i] = wheel((((i * 256) as u16 / NUM_LEDS as u16 + j as u16) & 255) as u8);
                 debug!("R: {} G: {} B: {}", data[i].r, data[i].g, data[i].b);
             }
+            data[0] = (0,0,0).into(); // temporariy turn off the horrible light...
             ws2812.write(&data).await;
 
             ticker.next().await;

@@ -20,8 +20,6 @@ critical-section = "1.1"
 panic-probe = { version = "0.3", features = ["print-defmt"] }
 
 smart-leds = "0.4.0"
-# pcd8544 = "0.2.0" # TODO: also consider the other one
-lcd-hal = { git = "https://github.com/tib888/lcd-hal" }
 log = "0.4"
 
 embedded-hal-1 = { package = "embedded-hal", version = "1.0" }

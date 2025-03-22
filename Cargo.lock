@@ -812,14 +812,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lcd-hal"
-version = "0.5.0"
-source = "git+https://github.com/tib888/lcd-hal#4507335fffead4afc7100b613e761b8435eaee85"
-dependencies = [
- "embedded-hal 0.2.7",
-]
-
-[[package]]
 name = "libc"
 version = "0.2.171"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1362,7 +1354,6 @@ dependencies = [
  "embedded-hal-bus",
  "embedded-io-async",
  "embedded-storage",
- "lcd-hal",
  "log",
  "panic-probe",
  "smart-leds",
