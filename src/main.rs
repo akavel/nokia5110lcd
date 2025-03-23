@@ -75,8 +75,10 @@ async fn main(spawner: Spawner) {
     // let spi_dev = SpiDevice::new(spi_bus, lcd_ce);
 
     let mut delayer = Delay{};
-    let mut lcd = Pcd8544::new(spi_dev, lcd_dc, lcd_rst, &mut delayer);
-
+    let mut lcd = Pcd8544::new(spi_dev, lcd_dc, lcd_rst, &mut delayer).expect("cannot fail");
+    // test pattern (50% on)
+    let ar: [u8; 42*6*2] = core::array::from_fn(|i| if i%2 == 0 { 0x55u8 } else { 0xAAu8 });
+    lcd.data(&ar);
 
     let mut counter = 0;
     loop {

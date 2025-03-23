@@ -45,7 +45,7 @@ where
     DC: OutputPin,
     RST: OutputPin,
 {
-    pub fn new(spi: SPI, dc: DC, rst: RST, delayer: &mut impl DelayNs) -> Result<Self, Error<SPI::Error, DC::Error, RST::Error>> {
+    pub fn new(spi: SPI, mut dc: DC, rst: RST, delayer: &mut impl DelayNs) -> Result<Self, Error<SPI::Error, DC::Error, RST::Error>> {
         dc.set_low().map_err(Error::Dc)?;
         let mut dev = Self { spi, dc, rst, func: FUNCTION_SET };
         dev.reset(delayer)?;
@@ -122,7 +122,7 @@ where
         Ok(())
     }
 
-    fn data(&mut self, data: &[u8]) -> Result<(), Error<SPI::Error, DC::Error, RST::Error>> {
+    pub fn data(&mut self, data: &[u8]) -> Result<(), Error<SPI::Error, DC::Error, RST::Error>> {
         self.dc.set_high().map_err(Error::Dc)?;
         self.spi.write(data).map_err(Error::Spi)?;
         Ok(())
