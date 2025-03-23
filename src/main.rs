@@ -6,16 +6,21 @@
 
 use core::fmt::Write;
 use defmt::*;
+use embedded_hal_bus::spi::ExclusiveDevice;
 use embassy_executor::Spawner;
 use embassy_rp::bind_interrupts;
 use embassy_rp::gpio::{Output, Level};
 use embassy_rp::peripherals::{DMA_CH0, PIO0, PIN_25, USB};
 use embassy_rp::pio::{InterruptHandler as PioInt, Pio};
 use embassy_rp::pio_programs::ws2812::{PioWs2812, PioWs2812Program};
+use embassy_rp::spi::{self, Spi};
 use embassy_rp::usb::{Driver, InterruptHandler as UsbInt};
 use embassy_time::{Duration, Ticker, Timer};
 use smart_leds::RGB8;
 use {defmt_rtt as _, panic_probe as _};
+
+pub mod pcd8544;
+use pcd8544::Pcd8544;
 
 bind_interrupts!(struct Irqs {
     PIO0_IRQ_0 => PioInt<PIO0>;
@@ -53,13 +58,23 @@ async fn main(spawner: Spawner) {
     let _ = spawner.spawn(rainbow(p.PIN_25, p.DMA_CH0, p.PIO0));
 
     // let mut lcd_clk   = Output::new(p.PIN_2, Level::Low);
-    // let mut lcd_din   = Output::new(p.PIN_3, Level::Low);
+    // let mut lcd_mosi  = Output::new(p.PIN_3, Level::Low);
     let mut lcd_dc    = Output::new(p.PIN_4, Level::Low);
     let mut lcd_ce    = Output::new(p.PIN_5, Level::Low);
     let mut lcd_rst   = Output::new(p.PIN_6, Level::Low);
     let mut lcd_light = Output::new(p.PIN_7, Level::High);
 
     lcd_light.set_high();
+
+    let mut cfg = spi::Config::default();
+    cfg.frequency = 2_000_000;
+    let mut spi_bus = Spi::new_blocking_txonly(p.SPI0, p.PIN_22, p.PIN_23, cfg);
+    // TODO: should not use new_no_delay but regular new
+    let spi_dev = ExclusiveDevice::new_no_delay(spi_bus, p.PIN_5);
+    // use embassy_embedded_hal::shared_bus::blocking::spi::SpiDevice;
+    // let spi_dev = SpiDevice::new(spi_bus, lcd_ce);
+
+    let mut lcd = Pcd8544::new(spi_dev, p.PIN_4, p.PIN_6);
 
 
     let mut counter = 0;

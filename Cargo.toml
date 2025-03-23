@@ -22,6 +22,7 @@ panic-probe = { version = "0.3", features = ["print-defmt"] }
 smart-leds = "0.4.0"
 log = "0.4"
 
+embedded-hal-0 = { package = "embedded-hal", version = "0.2.7" }
 embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
 embedded-hal-async = "1.0"
 embedded-hal-bus = { version = "0.1", features = ["async"] }
