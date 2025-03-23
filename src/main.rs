@@ -15,7 +15,7 @@ use embassy_rp::pio::{InterruptHandler as PioInt, Pio};
 use embassy_rp::pio_programs::ws2812::{PioWs2812, PioWs2812Program};
 use embassy_rp::spi::{self, Spi};
 use embassy_rp::usb::{Driver, InterruptHandler as UsbInt};
-use embassy_time::{Duration, Ticker, Timer};
+use embassy_time::{Duration, Ticker, Timer, Delay};
 use smart_leds::RGB8;
 use {defmt_rtt as _, panic_probe as _};
 
@@ -74,7 +74,8 @@ async fn main(spawner: Spawner) {
     // use embassy_embedded_hal::shared_bus::blocking::spi::SpiDevice;
     // let spi_dev = SpiDevice::new(spi_bus, lcd_ce);
 
-    let mut lcd = Pcd8544::new(spi_dev, lcd_dc, lcd_rst);
+    let mut delayer = Delay{};
+    let mut lcd = Pcd8544::new(spi_dev, lcd_dc, lcd_rst, &mut delayer);
 
 
     let mut counter = 0;
