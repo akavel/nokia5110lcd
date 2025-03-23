@@ -70,11 +70,11 @@ async fn main(spawner: Spawner) {
     cfg.frequency = 2_000_000;
     let mut spi_bus = Spi::new_blocking_txonly(p.SPI0, p.PIN_22, p.PIN_23, cfg);
     // TODO: should not use new_no_delay but regular new
-    let spi_dev = ExclusiveDevice::new_no_delay(spi_bus, p.PIN_5);
+    let spi_dev = ExclusiveDevice::new_no_delay(spi_bus, lcd_ce);
     // use embassy_embedded_hal::shared_bus::blocking::spi::SpiDevice;
     // let spi_dev = SpiDevice::new(spi_bus, lcd_ce);
 
-    let mut lcd = Pcd8544::new(spi_dev, p.PIN_4, p.PIN_6);
+    let mut lcd = Pcd8544::new(spi_dev, lcd_dc, lcd_rst);
 
 
     let mut counter = 0;
