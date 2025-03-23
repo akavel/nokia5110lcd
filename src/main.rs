@@ -64,7 +64,8 @@ async fn main(spawner: Spawner) {
     let mut lcd_rst   = Output::new(p.PIN_6, Level::Low);
     let mut lcd_light = Output::new(p.PIN_7, Level::High);
 
-    lcd_light.set_high();
+    // lcd_light.set_high();
+    lcd_light.set_low();
 
     let mut cfg = spi::Config::default();
     cfg.frequency = 2_000_000;
@@ -79,6 +80,12 @@ async fn main(spawner: Spawner) {
     // test pattern (50% on)
     let ar: [u8; 42*6*2] = core::array::from_fn(|i| if i%2 == 0 { 0x55u8 } else { 0xAAu8 });
     lcd.data(&ar);
+
+    lcd.clear();
+    lcd.position(0, 0);
+    lcd.data(&[0xE0, 0x38, 0xE4, 0x22, 0xA2, 0xE1, 0xE1, 0x61, 0xE1, 0x21, 0xA2, 0xE2, 0xE4, 0x38, 0xE0, 0x00]);
+    lcd.position(0, 1);
+    lcd.data(&[0x03, 0x0C, 0x10, 0x21, 0x21, 0x41, 0x48, 0x48, 0x48, 0x49, 0x25, 0x21, 0x10, 0x0C, 0x03, 0x00]);
 
     let mut counter = 0;
     loop {
