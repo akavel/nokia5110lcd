@@ -1,9 +1,16 @@
 [package]
-name = "test-5110"
+authors = [
+    "Mike Causer",
+    "Mateusz Czapliński <czapkofan@gmail.com>"
+]
+license = "MIT"
+name = "nokia5110lcd"
+description = "Nokia 5110 PCD8544 84x48 LCD driver, based on MicroPython lib"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+# TODO: simplify, keep what's needed for examples somewhere else
 embassy-embedded-hal = { version = "0.3.0", features = ["defmt"] }
 embassy-executor = { version = "0.7.0", features = ["task-arena-size-98304", "arch-cortex-m", "executor-thread", "executor-interrupt", "defmt"] }
 embassy-time = { version = "0.4.0", features = ["defmt", "defmt-timestamp-uptime"] }
