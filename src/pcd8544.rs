@@ -110,8 +110,8 @@ where
 
     // clear DDRAM, reset x,y position to 0,0
     pub fn clear(&mut self) -> Result<(), Error<SPI::Error, DC::Error, RST::Error>> {
-        const empty: [u8; BUF_SIZE] = [0; BUF_SIZE];
-        self.data(&empty)?;
+        const EMPTY: [u8; BUF_SIZE] = [0; BUF_SIZE];
+        self.data(&EMPTY)?;
         self.position(0, 0)?;
         Ok(())
     }

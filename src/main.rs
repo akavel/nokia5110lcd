@@ -51,39 +51,36 @@ fn wheel(mut wheel_pos: u8) -> RGB8 {
 async fn main(spawner: Spawner) {
     info!("Start");
     let p = embassy_rp::init(Default::default());
+    let mut delayer = Delay{};
 
     let usb_driver = Driver::new(p.USB, Irqs);
     let _ = spawner.spawn(logger_task(usb_driver));
 
     let _ = spawner.spawn(rainbow(p.PIN_25, p.DMA_CH0, p.PIO0));
 
-    let mut lcd_dc    = Output::new(p.PIN_20, Level::Low);
-    let mut lcd_ce    = Output::new(p.PIN_21, Level::High);
-    let mut lcd_rst   = Output::new(p.PIN_26, Level::Low);
+    let lcd_dc    = Output::new(p.PIN_20, Level::Low);
+    let lcd_ce    = Output::new(p.PIN_21, Level::High);
+    let lcd_rst   = Output::new(p.PIN_26, Level::Low);
     let mut lcd_light = Output::new(p.PIN_27, Level::High);
-
     // lcd_light.set_high();
     lcd_light.set_low();
-
     let mut cfg = spi::Config::default();
     cfg.frequency = 2_000_000;
-    let mut spi_bus = Spi::new_blocking_txonly(p.SPI0, p.PIN_22, p.PIN_23, cfg);
+    let spi_bus = Spi::new_blocking_txonly(p.SPI0, p.PIN_22, p.PIN_23, cfg);
     // TODO: should not use new_no_delay but regular new
     let spi_dev = ExclusiveDevice::new_no_delay(spi_bus, lcd_ce);
     // use embassy_embedded_hal::shared_bus::blocking::spi::SpiDevice;
     // let spi_dev = SpiDevice::new(spi_bus, lcd_ce);
-
-    let mut delayer = Delay{};
     let mut lcd = Pcd8544::new(spi_dev, lcd_dc, lcd_rst, &mut delayer).expect("cannot fail");
     // test pattern (50% on)
     let ar: [u8; 42*6*2] = core::array::from_fn(|i| if i%2 == 0 { 0x55u8 } else { 0xAAu8 });
-    lcd.data(&ar);
+    let _ = lcd.data(&ar);
 
-    lcd.clear();
-    lcd.position(0, 0);
-    lcd.data(&[0xE0, 0x38, 0xE4, 0x22, 0xA2, 0xE1, 0xE1, 0x61, 0xE1, 0x21, 0xA2, 0xE2, 0xE4, 0x38, 0xE0, 0x00]);
-    lcd.position(0, 1);
-    lcd.data(&[0x03, 0x0C, 0x10, 0x21, 0x21, 0x41, 0x48, 0x48, 0x48, 0x49, 0x25, 0x21, 0x10, 0x0C, 0x03, 0x00]);
+    let _ = lcd.clear();
+    let _ = lcd.position(0, 0);
+    let _ = lcd.data(&[0xE0, 0x38, 0xE4, 0x22, 0xA2, 0xE1, 0xE1, 0x61, 0xE1, 0x21, 0xA2, 0xE2, 0xE4, 0x38, 0xE0, 0x00]);
+    let _ = lcd.position(0, 1);
+    let _ = lcd.data(&[0x03, 0x0C, 0x10, 0x21, 0x21, 0x41, 0x48, 0x48, 0x48, 0x49, 0x25, 0x21, 0x10, 0x0C, 0x03, 0x00]);
 
     let mut counter = 0;
     loop {
