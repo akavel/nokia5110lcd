@@ -57,12 +57,10 @@ async fn main(spawner: Spawner) {
 
     let _ = spawner.spawn(rainbow(p.PIN_25, p.DMA_CH0, p.PIO0));
 
-    // let mut lcd_clk   = Output::new(p.PIN_2, Level::Low);
-    // let mut lcd_mosi  = Output::new(p.PIN_3, Level::Low);
-    let mut lcd_dc    = Output::new(p.PIN_4, Level::Low);
-    let mut lcd_ce    = Output::new(p.PIN_5, Level::Low);
-    let mut lcd_rst   = Output::new(p.PIN_6, Level::Low);
-    let mut lcd_light = Output::new(p.PIN_7, Level::High);
+    let mut lcd_dc    = Output::new(p.PIN_20, Level::Low);
+    let mut lcd_ce    = Output::new(p.PIN_21, Level::High);
+    let mut lcd_rst   = Output::new(p.PIN_26, Level::Low);
+    let mut lcd_light = Output::new(p.PIN_27, Level::High);
 
     // lcd_light.set_high();
     lcd_light.set_low();
