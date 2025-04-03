@@ -27,6 +27,7 @@
 
 use embedded_hal_1::{digital::OutputPin, spi::SpiDevice, delay::DelayNs};
 pub mod buffer;
+pub use buffer::Buffer;
 
 #[derive(Clone, Copy, Debug)]
 pub enum Error<SPI, DC, RST> {

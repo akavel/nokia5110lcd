@@ -14,6 +14,12 @@ pub struct Buffer {
     pub bytes: [u8; BUF_LEN],
 }
 
+impl Buffer {
+    pub fn new() -> Self {
+        Self { bytes: [0; BUF_LEN] }
+    }
+}
+
 impl Dimensions for Buffer {
     fn bounding_box(&self) -> Rectangle {
         Rectangle {
