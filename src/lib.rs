@@ -140,9 +140,9 @@ const POWER_DOWN: u8       = 0x04;
 const ADDRESSING_VERT: u8  = 0x02;
 const EXTENDED_INSTR: u8   = 0x01;
 
-const WIDTH: u8 = 0x54;  // 84
-const HEIGHT: u8 = 0x30;  // 48
-const BUF_SIZE: usize = HEIGHT as usize * WIDTH as usize / 8;
+pub const WIDTH: u8 = 0x54;  // 84
+pub const HEIGHT: u8 = 0x30;  // 48
+pub const BUF_SIZE: usize = HEIGHT as usize * WIDTH as usize / 8;
 
 // Set operation voltage
 const SET_VOP: u8 = 0x80;
