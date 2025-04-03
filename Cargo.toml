@@ -36,7 +36,7 @@ embedded-hal-bus = { version = "0.1", features = ["async"] }
 embedded-io-async = { version = "0.6.1", features = ["defmt-03"] }
 embedded-storage = { version = "0.3" }
 
-embedded_graphics_core = "0.4.0"
+embedded-graphics-core = "0.4.0"
 
 [profile.release]
 debug = 2
