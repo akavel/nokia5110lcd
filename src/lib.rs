@@ -23,6 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#![no_std]
+
 use embedded_hal_1::{digital::OutputPin, spi::SpiDevice, delay::DelayNs};
 
 #[derive(Clone, Copy, Debug)]
